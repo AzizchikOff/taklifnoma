@@ -51,7 +51,6 @@ $('calendar').addEventListener('click',()=>{
  const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Taklifnoma//UZ','BEGIN:VEVENT',`UID:wedding-${config.date}@taklifnoma`,`DTSTAMP:${stamp(new Date())}`,`DTSTART:${stamp(start)}`,`DTEND:${stamp(new Date(start.getTime()+3*3600000))}`,`SUMMARY:${escapeICS(config.groom+' & '+config.bride+' — To‘y')}`,`LOCATION:${escapeICS(config.venue+' '+config.address)}`,'END:VEVENT','END:VCALENDAR',''].join('\r\n');
  const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='toy.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-if(config.groom==='Kuyov'||!config.time||!config.venue){$('setupNote').hidden=false;$('setupNote').textContent='Namuna: kuyov-kelin ismlari, to‘y vaqti va manzili hali kiritilmagan.';}
 render();setInterval(updateCountdown,1000);
 
 // Subtle depth on pointer devices; touch and reduced-motion users keep a static view.
