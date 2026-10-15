@@ -54,3 +54,17 @@ header.scrolled{background:#f4efe5d9;box-shadow:0 8px 30px #243d3215}
 @keyframes orbit-cross{from{transform:rotateZ(50deg) rotateY(65deg) rotateX(15deg)}to{transform:rotateZ(410deg) rotateY(65deg) rotateX(15deg)}}
 @media(max-width:600px){.orbits{width:110vw;opacity:.3}.honor .orbits{width:125vw;opacity:.48}.honor .cover::before{font-size:45px;left:3%}.honor .cover::after{font-size:65px;right:3%}}
 @media(prefers-reduced-motion:reduce){.orbit{animation:none;transform:rotateX(65deg) rotateZ(25deg)}.orbit:nth-child(2){transform:rotateY(65deg) rotateZ(-25deg)}}
+
+/* General invitation: pearl blue background with more defined moving gold orbits. */
+body:not(.honor){--paper:#dce8ed;--ink:#203d4c;--gold:#89652c;--line:#99aeb580;background-color:#dce8ed}
+body:not(.honor)::before{opacity:.9;background:radial-gradient(ellipse,#7aa4bd88,transparent 66%)}
+body:not(.honor)::after{opacity:.85;background:radial-gradient(ellipse,#d9b87666,transparent 65%)}
+body:not(.honor) header{background:#e7f0f3bd;border-color:#ffffffab}
+body:not(.honor) header.scrolled{background:#e7f0f3e6}
+body:not(.honor) .orbits{opacity:.78}
+body:not(.honor) .orbit{border-color:#9a723c85;box-shadow:0 0 20px #b4873a0c}
+body:not(.honor) .orbit::after{background:#a97b34;box-shadow:0 0 16px #be954a99}
+body:not(.honor) .details{background:#f3f7f9a3}
+body:not(.honor) .letter{background:radial-gradient(ellipse,#f5f8faaa,transparent 73%)}
+.countdown{padding-bottom:55px}
+@media(max-width:600px){body:not(.honor) .orbits{opacity:.65}}
