@@ -82,3 +82,48 @@ if ('IntersectionObserver' in window && !reducedMotion.matches) {
   section.classList.add('reveal-ready'); observer.observe(section);
  });
 }
+
+
+// Decorative canvas: lightweight particles, cursor response and distinct guest themes.
+(() => {
+ const scene=document.createElement('div');
+ scene.className='scene';scene.setAttribute('aria-hidden','true');
+ const canvas=document.createElement('canvas');
+ const orbits=document.createElement('div');orbits.className='orbits';
+ for(let i=0;i<3;i++){const ring=document.createElement('i');ring.className='orbit';orbits.append(ring);}
+ scene.append(canvas,orbits);document.body.prepend(scene);
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ let width=0,height=0,particles=[],frame=0,last=0;
+ const pointer={x:0,y:0,active:false};
+ function resize(){
+  width=innerWidth;height=innerHeight;
+  const ratio=Math.min(devicePixelRatio||1,1.5);
+  canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  const count=width<600?30:65;
+  particles=Array.from({length:count},()=>({x:Math.random()*width,y:Math.random()*height,r:Math.random()*1.6+.5,speed:Math.random()*7+3,phase:Math.random()*Math.PI*2}));
+  if(reducedMotion.matches)draw(0);
+ }
+ function draw(delta){
+  ctx.clearRect(0,0,width,height);
+  for(const p of particles){
+   if(!reducedMotion.matches){p.y-=p.speed*delta;p.phase+=delta*.25;if(p.y< -8)p.y=height+8;}
+   let x=p.x+Math.sin(p.phase)*12,y=p.y;
+   if(pointer.active&&!reducedMotion.matches){
+    const dx=x-pointer.x,dy=y-pointer.y,distance=Math.hypot(dx,dy);
+    if(distance<130&&distance>0){const push=(1-distance/130)*18;x+=dx/distance*push;y+=dy/distance*push;}
+   }
+   ctx.fillStyle=honor?'rgba(240,206,137,.65)':'rgba(160,122,54,.38)';
+   ctx.beginPath();ctx.arc(x,y,p.r,0,Math.PI*2);ctx.fill();
+   if(honor&&p.r>1.7){ctx.strokeStyle='rgba(240,206,137,.25)';ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke();}
+  }
+ }
+ function tick(now){frame=0;if(document.hidden||reducedMotion.matches)return;const delta=last?Math.min((now-last)/1000,.05):0;last=now;draw(delta);frame=requestAnimationFrame(tick);}
+ function sync(){if(frame)cancelAnimationFrame(frame);frame=0;last=0;if(!document.hidden&&!reducedMotion.matches)frame=requestAnimationFrame(tick);else draw(0);}
+ addEventListener('resize',resize,{passive:true});
+ addEventListener('pointermove',event=>{pointer.x=event.clientX;pointer.y=event.clientY;pointer.active=event.pointerType==='mouse';},{passive:true});
+ document.addEventListener('pointerleave',()=>pointer.active=false);
+ document.addEventListener('visibilitychange',sync);
+ reducedMotion.addEventListener('change',sync);
+ resize();sync();
+})();
