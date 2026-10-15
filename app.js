@@ -126,3 +126,54 @@ if ('IntersectionObserver' in window && !reducedMotion.matches) {
  reducedMotion.addEventListener('change',sync);
  resize();sync();
 })();
+
+
+// Original gentle instrumental, synthesized locally without external audio downloads.
+if (!config.musicUrl) {
+ const AudioEngine=window.AudioContext||window.webkitAudioContext;
+ if(AudioEngine){
+  let context,master,timer,isPlaying=false,nextNote=0,step=0;
+  const melody=[72,76,79,76,74,72,69,67,69,72,76,74,72,null,67,null,
+   69,72,76,79,81,79,76,74,72,69,67,69,72,null,null,null];
+  const chords=[[48,55,60],[45,52,57],[53,60,65],[43,50,55]];
+  const button=document.createElement('button');button.className='text-button';button.type='button';
+  button.style.cssText='min-width:44px;min-height:44px;font-size:18px';
+  function label(){button.textContent=isPlaying?'♫':'♪';button.setAttribute('aria-pressed',String(isPlaying));button.setAttribute('aria-label',isPlaying?'Musiqani o‘chirish':'Musiqani yoqish');button.title=isPlaying?'Musiqani o‘chirish':'Musiqani yoqish';}
+  label();document.querySelector('header').append(button);
+  function tone(midi,time,length,volume){
+   const gain=context.createGain();gain.gain.setValueAtTime(0,time);
+   gain.gain.linearRampToValueAtTime(volume,time+.025);
+   gain.gain.exponentialRampToValueAtTime(.0001,time+length);
+   gain.connect(master);
+   [1,2,3].forEach((harmonic,i)=>{
+    const oscillator=context.createOscillator(),partial=context.createGain();
+    oscillator.type='sine';oscillator.frequency.value=440*Math.pow(2,(midi-69)/12)*harmonic;
+    partial.gain.value=[1,.18,.045][i];oscillator.connect(partial);partial.connect(gain);
+    oscillator.start(time);oscillator.stop(time+length+.05);
+   });
+  }
+  function schedule(){
+   while(nextNote<context.currentTime+.2){
+    const note=melody[step%melody.length];
+    if(note!==null)tone(note,nextNote,2.7,.15);
+    if(step%8===0)chords[Math.floor(step/8)%4].forEach(note=>tone(note,nextNote,5.4,.055));
+    nextNote+=.72;step++;
+   }
+  }
+  async function play(){
+   try{
+    if(!context){context=new AudioEngine();master=context.createGain();master.gain.value=0;master.connect(context.destination);}
+    await context.resume();if(isPlaying)return;
+    isPlaying=true;master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(.3,context.currentTime,.35);
+    nextNote=context.currentTime+.05;schedule();timer=setInterval(schedule,100);label();
+   }catch{isPlaying=false;label();}
+  }
+  function pause(){
+   if(!context)return;clearInterval(timer);isPlaying=false;
+   master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(0,context.currentTime,.12);label();
+  }
+  button.addEventListener('click',()=>isPlaying?pause():play());
+  $('open').addEventListener('click',play,{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+ }
+}
