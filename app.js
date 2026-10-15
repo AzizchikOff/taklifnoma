@@ -53,3 +53,32 @@ $('calendar').addEventListener('click',()=>{
 });
 if(config.groom==='Kuyov'||!config.time||!config.venue){$('setupNote').hidden=false;$('setupNote').textContent='Namuna: kuyov-kelin ismlari, to‘y vaqti va manzili hali kiritilmagan.';}
 render();setInterval(updateCountdown,1000);
+
+// Subtle depth on pointer devices; touch and reduced-motion users keep a static view.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const envelope = $('open');
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+ envelope.addEventListener('pointermove', event => {
+  if (opened || reducedMotion.matches) return;
+  const box = envelope.getBoundingClientRect();
+  envelope.style.setProperty('--tilt-x', `${-(event.clientY-box.top-box.height/2)/28}deg`);
+  envelope.style.setProperty('--tilt-y', `${(event.clientX-box.left-box.width/2)/35}deg`);
+ });
+ const resetTilt = () => { envelope.style.setProperty('--tilt-x','0deg'); envelope.style.setProperty('--tilt-y','0deg'); };
+ envelope.addEventListener('pointerleave', resetTilt);
+ envelope.addEventListener('click', resetTilt);
+}
+const navigation = document.querySelector('header');
+const updateNavigation = () => navigation.classList.toggle('scrolled', window.scrollY > 20);
+addEventListener('scroll', updateNavigation, {passive:true});
+updateNavigation();
+if ('IntersectionObserver' in window && !reducedMotion.matches) {
+ const observer = new IntersectionObserver(entries => {
+  for (const entry of entries) if (entry.isIntersecting) {
+   entry.target.classList.add('is-visible'); observer.unobserve(entry.target);
+  }
+ }, {threshold:0.08});
+ document.querySelectorAll('.letter,.details,.countdown,footer').forEach(section => {
+  section.classList.add('reveal-ready'); observer.observe(section);
+ });
+}
