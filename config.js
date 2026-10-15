@@ -1,7 +1,7 @@
 // Haqiqiy ma’lumotlarni shu yerda kiriting. Noma’lum ma’lumotlar o‘ylab topilmagan.
 window.WEDDING = {
-  groom: 'Kuyov', bride: 'Kelin',
-  date: '2026-11-07', time: '', timezone: '+05:00',
+  groom: 'Jasurbek', bride: 'Go`zaloy',
+  date: '2026-11-07', time: '06:00', timezone: '+05:00',
   venue: '', address: '', mapUrl: '',
   musicUrl: '' // O‘zingiz foydalanish huquqiga ega audio fayl manzili.
 };
